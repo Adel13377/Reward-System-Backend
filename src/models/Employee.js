@@ -5,7 +5,8 @@ const employeeSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     points: { type: Number, default: 0 },
     department: String,
-    joinDate: { type: Date, default: Date.now }
+    joinDate: { type: Date, default: Date.now },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true }
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);

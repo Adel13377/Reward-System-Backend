@@ -4,7 +4,13 @@ const employeeController = {
     // Get all employees
     getAllEmployees: async (req, res) => {
         try {
-            const employees = await Employee.find();
+            console.log(req.user);
+            const adminid = req.user._id;
+            if (!adminid) {
+                return res.status(404).json({ message: "couldn't find your employees" });
+            }
+            console.log(adminid);
+            const employees = await Employee.find({userId: adminid});
             res.json(employees);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -14,7 +20,14 @@ const employeeController = {
     // Get single employee
     getEmployeeById: async (req, res) => {
         try {
-            const employee = await Employee.findById(req.params.id);
+            const adminid = req.user._id;
+            if (!adminid) {
+                return res.status(404).json({ message: "couldn't find your employees" });
+            }
+            const employee = await Employee.find({
+                _id: req.params.id,
+                userId: adminid
+            });
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
@@ -30,7 +43,8 @@ const employeeController = {
             name: req.body.name,
             email: req.body.email,
             points: req.body.points || 0,
-            department: req.body.department
+            department: req.body.department,
+            userId: req.user._id
         });
 
         try {
@@ -44,7 +58,14 @@ const employeeController = {
     // Update employee points
     updatePoints: async (req, res) => {
         try {
-            const employee = await Employee.findById(req.params.id);
+            const adminid = req.user._id;
+            if (!adminid) {
+                return res.status(404).json({ message: "couldn't update this employee" });
+            }
+            const employee = await Employee.findOne({
+                _id: req.params.id,
+                userId: adminid
+            });
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
@@ -60,7 +81,14 @@ const employeeController = {
     // Delete employee
     deleteEmployee: async (req, res) => {
         try {
-            const employee = await Employee.findById(req.params.id);
+            const adminid = req.user._id;
+            if (!adminid) {
+                return res.status(404).json({ message: "couldn't find your employees" });
+            }
+            const employee = await Employee.findById({
+                _id: req.params.id,
+                userId: adminid
+            });
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
