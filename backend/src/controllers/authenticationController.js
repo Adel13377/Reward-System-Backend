@@ -39,7 +39,7 @@ const login = async (req, res) => {
         //create and assign a token
         const userPayload = { _id: user._id, username: user.username };
         console.log("user: " + user);
-        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15s'});
+        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '40s'});
         const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'});
         //save refresh token
         await new RefreshToken({ token: refreshToken, userId: user._id }).save();

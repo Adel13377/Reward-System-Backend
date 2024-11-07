@@ -23,7 +23,7 @@ const Register = () => {
                 navigate("dashboard")
             } catch (error) {
                 console.error("Login failed:", error.response ? error.response.data : error.message);
-                toast("Login failed, please try again.");
+                toast("Invalid username or password");
             }
         }
     };
