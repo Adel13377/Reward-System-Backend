@@ -1,16 +1,18 @@
-// function authenticateToken(req, res, next) {
-//     const authHeader = req.headers['authorization'];
-//     const token = authHeader && authHeader.split(' ')[1];
-//     if (token == null) return res.sendStatus(401).json({ message: 'Access denied' });
+const Users = require('../models/Users');
 
-//     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-//         if (err) return res.sendStatus(403).json({ message: 'Invalid token' });
-//         req.user = user;
-//         next();
-//     });
-// }
+const getadmin = async (req, res) => {
+    try {
+        console.log(req.user);
+        const adminid = req.user._id;
+        if (!adminid) {
+            return res.status(404).json({ message: "couldn't find your employees" });
+        }
+        console.log(adminid);
+        const admin = await Users.find({_id: adminid});
+        res.json(admin);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-// app.get('/posts', authenticateToken, (req, res) => {
-//     res.json(posts.filter(post => post.username === req.user.name));
-//     // res.json(posts);
-// });
+module.exports = getadmin;

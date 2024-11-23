@@ -1,0 +1,88 @@
+@import "primeicons/primeicons.css";
+@import "primereact/resources/themes/lara-light-indigo/theme.css";
+@import "primereact/resources/primereact.min.css";
+@import 'bootstrap/dist/css/bootstrap.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+#root {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    overflow: auto;
+}
+
+.data-list {
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 30px 0;
+    width: calc(100% - 2rem);
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.data-list .btn {
+    margin: 5px;
+    white-space: nowrap;
+}
+
+.p-datatable {
+    width: 100%;
+}
+
+.p-datatable .p-datatable-thead > tr > th, 
+.p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 1.5rem;
+}
+
+.p-datatable-tbody > tr > td {
+    border-right: 2px solid #ddd;
+}
+
+.p-datatable-tbody > tr > td:last-child {
+    border-right: none;
+}
+.p-datatable .p-datatable-tbody > tr > td:last-child,
+.p-datatable .p-datatable-thead > tr > th:last-child {
+    text-align: center; /* Align text to the right */
+    padding: 0; /* Remove padding */
+}
+
+/* Optional: Add some spacing to the right to prevent content from touching the edge */
+.p-datatable .p-datatable-tbody > tr > td:last-child {
+    padding-right: 0.5rem; /* Adjust spacing as needed */
+}
+/* Hide actions column on small screens */
+@media (max-width: 768px) {
+    .p-datatable .p-datatable-tbody > tr > td:last-child, 
+    .p-datatable .p-datatable-thead > tr > th:last-child {
+        display: none;
+    }
+}

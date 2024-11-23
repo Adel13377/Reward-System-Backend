@@ -15,8 +15,10 @@ const refreshToken = async (req, res) => {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
         if (err) return res.sendStatus(403).json({ error: 'Invalid token' });
 
-        const { username, _id } = user;
-        const accessToken = generateAccessToken({ _id, username });
+        console.log("Decoded user from refresh token:", user);
+        const { username, _id, name } = user;
+        const accessToken = generateAccessToken({ _id, username, name });
+        console.log("accessToken: " + accessToken);
         res.json({ accessToken: accessToken })
     })
 }
@@ -37,11 +39,13 @@ const login = async (req, res) => {
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) return res.status(400).json({ error: 'Invalid username or password' });
         //create and assign a token
-        const userPayload = { _id: user._id, username: user.username };
+        const userPayload = { _id: user._id, username: user.username, name: user.firstname };
         console.log("user: " + user);
-        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '40s'});
+        console.log("userPayload: ", userPayload);
+        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s'});
         const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'});
         //save refresh token
+        await RefreshToken.deleteMany({});
         await new RefreshToken({ token: refreshToken, userId: user._id }).save();
 
         res.json({ accessToken: accessToken , refreshToken: refreshToken });
@@ -51,13 +55,27 @@ const login = async (req, res) => {
     }
 }
 
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Access denied' });
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid token' });
+        }
+        req.user = user;
+        next();
+    });
+}
+
 const logout = async (req, res) => {
     try {
         const token = req.body.token;
         if (!token) {
             return res.status(400).json({ error: 'Token is required' });
         }
-        
+        console.log("Token: ", token);
         // Remove the refresh token from the database
         const result = await RefreshToken.deleteOne({ token });
         if (result.deletedCount === 0) {
@@ -71,4 +89,4 @@ const logout = async (req, res) => {
     }
 };
 
-module.exports = { login, refreshToken, logout };
+module.exports = { login, refreshToken, logout, authenticateToken };

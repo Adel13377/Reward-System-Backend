@@ -2,7 +2,7 @@ const Employee = require('../models/Employee');
 
 const employeeController = {
     // Get all employees
-    getAllEmployees: async (req, res) => {
+     getAllEmployees: async (req, res) => {
         try {
             console.log(req.user);
             const adminid = req.user._id;
@@ -77,6 +77,31 @@ const employeeController = {
             res.status(400).json({ message: error.message });
         }
     },
+
+    editEmployee: async (req, res) => {
+        try {
+            const adminid = req.user._id;
+            if (!adminid) {
+                return res.status(404).json({ message: "couldn't update this employee" });
+            }
+            const employee = await Employee.findOne({
+                _id: req.params.id,
+                userId: adminid
+            });
+            if (!employee) {
+                return res.status(404).json({ message: 'Employee not found' });
+            }
+
+            employee.name = req.body.name;
+            employee.email = req.body.email;
+            employee.department = req.body.department;
+            employee.points = req.body.points;
+            const updatedEmployee = await employee.save();
+            res.json(updatedEmployee);
+        } catch (error) {
+            res.status(400).json({ message: error.message });
+    }
+},
 
     // Delete employee
     deleteEmployee: async (req, res) => {

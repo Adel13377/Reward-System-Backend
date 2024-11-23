@@ -7,5 +7,6 @@ router.get('/:id', employeeController.getEmployeeById);
 router.post('/new', employeeController.createEmployee);
 router.patch('/:id/edit-p', employeeController.updatePoints);
 router.delete('/del/:id', employeeController.deleteEmployee);
+router.put('/update/:id', employeeController.editEmployee);
 
 module.exports = router;

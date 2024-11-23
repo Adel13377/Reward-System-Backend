@@ -35,11 +35,11 @@ const Register = () => {
     };
   return (
     <div className="flex flex-col items-start gap-14 bg-gray-100 box-border shadow-gray-300 shadow-lg
-    border-[1px] border-gray-300 rounded-[5px] w-fit h-[300px]">
+    border-[1px] border-gray-300 rounded-[5px] w-fit h-[355px]">
         <div className="w-full h-3 font-medium text-3xl py-3 text-center">
             <h1>Admin Registeration</h1>
         </div>
-        <div className="bg-white w-full p-2 text-sm font-normal">
+        <div className="bg-white w-full p-2 text-sm font-normal h-[265px]">
             <form onSubmit={handleSubmit}>
                 <div className="flex gap-2">
                     <div className="flex flex-col">

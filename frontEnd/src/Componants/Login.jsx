@@ -16,6 +16,7 @@ const Register = () => {
                     password: password
                 });
                 const { accessToken, refreshToken } = response.data;
+                localStorage.setItem("username", userName);
                 localStorage.setItem("accessToken", accessToken);
                 localStorage.setItem("refreshToken", refreshToken);
                 console.log("Login Done", accessToken);
@@ -47,7 +48,7 @@ const Register = () => {
             <div className="w-full h-3 font-medium text-3xl py-3 text-center">
                 <h1>Admin Login</h1>
             </div>
-            <div className="bg-white w-full p-2 text-sm font-normal">
+            <div className="bg-white w-full p-2 text-sm font-normal h-[210px]">
                 <form onSubmit={proceedLogin}>
                     <div className="flex gap-2 flex-col ">
                         <div className="flex flex-col">
