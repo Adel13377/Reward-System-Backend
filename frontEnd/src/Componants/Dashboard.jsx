@@ -9,7 +9,7 @@ import { Buffer } from 'buffer';
 import { jwtDecode } from 'jwt-decode';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { confirmDialog } from 'primereact/confirmdialog';
-import axi from "axios";
+// import axi from "axios";
 // import { ConfirmDialog } from 'primereact/confirmdialog';
 // import { confirmDialog } from 'primereact/confirmdialog';
 // import { Dialog } from 'primereact/dialog';
@@ -159,7 +159,13 @@ const Dashboard = () => {
             </button>
 
             {/* Confirm Dialog */}
-            <ConfirmDialog />
+            <ConfirmDialog
+                style={{
+                    width: '50%', // Set consistent width
+                    borderRadius: '8px', // Rounded corners
+                }}
+                className="custom-confirm-dialog"
+            />
             <div className="data-list">
                 <div className="add-user">
                     <button
@@ -185,6 +191,13 @@ const Dashboard = () => {
                             header="Actions"
                             body={(rowData) => actionsTemplate(rowData)}
                             className="action-column"
+                            headerStyle={{textAlign: 'center',
+                                paddingLeft: '3em',
+                            }}
+                            style={{
+                               
+                                width: '11em'
+                             }}
                         ></Column>
                     </DataTable>
                 )}
@@ -192,9 +205,18 @@ const Dashboard = () => {
 
             {/* Dialog Component */}
             <Dialog
-                header={dialogType === 'add' ? 'Add User' : dialogType === 'edit' ? 'Edit User' : 'Confirm Delete'}
+                className="custom-dialog"
+                header={dialogType === 'add' ? 'Add User' : dialogType === 'edit' ? 'Edit User' : dialogType === 'delete' ? 'Confirm Delete' : 'View user'}
                 visible={showDialog}
-                style={{ width: '50vw' }}
+                style={{ width: '50%' }}
+                headerStyle={{  
+                    padding: '15px 20px', // Add padding directly to the header
+                    backgroundColor: '#f5f5f5', // Optional: light background
+                    borderBottom: '1px solid #ddd', // Optional: border at the bottom
+                    fontSize: '18px', // Optional: font size
+                    fontWeight: 'bold', // Optional: make text bold
+                    textAlign: 'center', 
+                }}
                 onHide={() => setShowDialog(false)}
                 footer={
                     dialogType === 'delete' ? (
@@ -202,53 +224,120 @@ const Dashboard = () => {
                             <Button label="No" icon="pi pi-times" onClick={() => setShowDialog(false)} />
                             <Button label="Yes" icon="pi pi-check" onClick={handleDelete} />
                         </>
-                    ) : (
+                    ) : dialogType === 'edit' || dialogType === 'add' ? (
                         <>
                             <Button label="Cancel" icon="pi pi-times" onClick={() => setShowDialog(false)} />
                             <Button label="Save" icon="pi pi-check" onClick={handleSave} />
                         </>
-                    )
+                    ) : null
                 }
-            >
-                {dialogType === 'delete' ? (
-                    <p>Are you sure you want to delete this user?</p>
-                ) : (
-                    <div>
-                        <label>Name:</label>
-                        <input
-                            type="text"
-                            value={selectedProduct?.name || ''}
-                            onChange={(e) =>
-                                setSelectedProduct((prev) => ({ ...prev, name: e.target.value }))
-                            }
-                        />
-                        <label>Email:</label>
-                        <input
-                            type="email"
-                            value={selectedProduct?.email || ''}
-                            onChange={(e) =>
-                                setSelectedProduct((prev) => ({ ...prev, email: e.target.value }))
-                            }
-                        />
-                         <label>Department:</label>
-                        <input
-                            type="text"
-                            value={selectedProduct?.department || ''}
-                            onChange={(e) =>
-                                setSelectedProduct((prev) => ({ ...prev, department: e.target.value }))
-                            }
-                        />
-                        <label>Points:</label>
-                        <input
-                            type="number"
-                            value={selectedProduct?.points || ''}
-                            onChange={(e) =>
-                                setSelectedProduct((prev) => ({ ...prev, points: e.target.value }))
-                            }
-                        />
-                    </div>
-                )}
-            </Dialog>
+>
+    <div className="dialog-content">
+        {dialogType === 'delete' ? (
+            <p>Are you sure you want to delete this user?</p>
+        ) : dialogType === 'view' ? (
+            <div>
+            <label>Name:</label>
+            <div className="input-with-icon">
+                <i className="pi pi-user input-icon"></i>
+                <input
+                    type="text"
+                    className="dialog-input"
+                    value={selectedProduct?.name || ''}
+                    disabled
+                />
+            </div>
+
+            <label>Email:</label>
+            <div className="input-with-icon">
+                <i className="pi pi-envelope input-icon"></i>
+                <input
+                    type="email"
+                    className="dialog-input"
+                    value={selectedProduct?.email || ''}
+                    disabled
+                />
+            </div>
+
+            <label>Department:</label>
+            <div className="input-with-icon">
+                <i className="pi pi-sitemap input-icon"></i>
+                <input
+                    type="text"
+                    className="dialog-input"
+                    value={selectedProduct?.department || ''}
+                    disabled
+                />
+            </div>
+
+            <label>Points:</label>
+            <div className="input-with-icon">
+                <i className="pi pi-star input-icon"></i>
+                <input
+                    type="number"
+                    className="dialog-input"
+                    value={selectedProduct?.points || ''}
+                   disabled
+                />
+            </div>
+        </div>
+        ) : (
+            <div>
+                <label>Name:</label>
+                <div className="input-with-icon">
+                    <i className="pi pi-user input-icon"></i>
+                    <input
+                        type="text"
+                        className="dialog-input"
+                        value={selectedProduct?.name || ''}
+                        onChange={(e) =>
+                            setSelectedProduct((prev) => ({ ...prev, name: e.target.value }))
+                        }
+                    />
+                </div>
+
+                <label>Email:</label>
+                <div className="input-with-icon">
+                    <i className="pi pi-envelope input-icon"></i>
+                    <input
+                        type="email"
+                        className="dialog-input"
+                        value={selectedProduct?.email || ''}
+                        onChange={(e) =>
+                            setSelectedProduct((prev) => ({ ...prev, email: e.target.value }))
+                        }
+                    />
+                </div>
+
+                <label>Department:</label>
+                <div className="input-with-icon">
+                    <i className="pi pi-sitemap input-icon"></i>
+                    <input
+                        type="text"
+                        className="dialog-input"
+                        value={selectedProduct?.department || ''}
+                        onChange={(e) =>
+                            setSelectedProduct((prev) => ({ ...prev, department: e.target.value }))
+                        }
+                    />
+                </div>
+
+                <label>Points:</label>
+                <div className="input-with-icon">
+                    <i className="pi pi-star input-icon"></i>
+                    <input
+                        type="number"
+                        className="dialog-input"
+                        value={selectedProduct?.points || ''}
+                        onChange={(e) =>
+                            setSelectedProduct((prev) => ({ ...prev, points: e.target.value }))
+                        }
+                    />
+                </div>
+            </div>
+        )}
+    </div>
+</Dialog>
         </div>
     );
 };

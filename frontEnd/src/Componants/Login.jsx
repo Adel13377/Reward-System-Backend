@@ -16,7 +16,6 @@ const Register = () => {
                     password: password
                 });
                 const { accessToken, refreshToken } = response.data;
-                localStorage.setItem("username", userName);
                 localStorage.setItem("accessToken", accessToken);
                 localStorage.setItem("refreshToken", refreshToken);
                 console.log("Login Done", accessToken);
@@ -62,7 +61,7 @@ const Register = () => {
                     </div>
                     <div className="flex justify-evenly gap-4 items-center py-3">
                         <input className="text-white bg-blue-700 cursor-pointer py-2 px-3 rounded-md" type="submit" value="Login" />
-                        <a href="register" className="text-white bg-green-700 cursor-pointer py-2 px-3 rounded-md">Add User</a>
+                        <a href="register" className="text-white bg-green-700 cursor-pointer py-2 px-3 rounded-md">Resgister</a>
                     </div>
                 </form>
             </div>

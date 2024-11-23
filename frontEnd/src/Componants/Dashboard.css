@@ -86,3 +86,66 @@ html, body {
         display: none;
     }
 }
+
+/* Add padding, border, and a consistent appearance for inputs */
+.dialog-input {
+    width: 100%;
+    padding: 10px; /* Adjust padding */
+    margin-bottom: 10px; /* Space between inputs */
+    border: 1px solid #ccc; /* Add border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Improve readability */
+    display: flex;
+    align-items: center; /* Align icon and text */
+}
+
+/* For input container with icons */
+.input-with-icon {
+    position: relative;
+}
+.custom-dialog .dialog-content {
+    padding: 20px;
+    box-sizing: border-box; /* Adjust as needed */
+}
+
+.input-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888; /* Icon color */
+}
+
+.custom-dialog .p-dialog-footer {
+    padding: 0px 20px 20px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.input-with-icon input {
+    padding-left: 30px; /* Adjust to fit the icon */
+}
+
+.custom-confirm-dialog .p-dialog-header {
+    background-color: #f8f9fa; /* Light background color for header */
+    padding: 20px; /* Padding around the header */
+    border-bottom: 1px solid #ddd; /* Separator line */
+    font-size: 18px; /* Adjust header font size */
+    font-weight: bold;
+    text-align: center; /* Center-align header text */
+}
+
+.custom-confirm-dialog .p-dialog-content {
+    padding: 20px; /* Add padding for the content area */
+    font-size: 16px; /* Adjust font size */
+    text-align: center; /* Center-align content */
+}
+
+.custom-confirm-dialog .p-dialog-footer {
+    display: flex;
+    justify-content: center; /* Center-align buttons */
+    gap: 10px; /* Add spacing between buttons */
+    padding: 15px; /* Add padding for footer area */
+    border-top: 1px solid #ddd; /* Optional: separator line at footer */
+}
