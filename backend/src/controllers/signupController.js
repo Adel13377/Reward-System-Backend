@@ -12,11 +12,8 @@ const signup = async (req, res) => {
         number: req.body.number,
         company: req.body.company
     }
-    const existinguser = await Users.findOne({ username: data.username });
-    if (existinguser) {
-        return res.status(409).json({ error: "User already exists" });
-    }
-    const errors = validateSignup(data);
+    
+    const errors = await validateSignup(data);
     if (Object.keys(errors).length > 0) {
         console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
         return res.status(400).json({ errors });

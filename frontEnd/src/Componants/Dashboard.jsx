@@ -22,6 +22,7 @@ const Dashboard = () => {
     const [showDialog, setShowDialog] = useState(false);
     const [dialogType, setDialogType] = useState(''); // 'add', 'edit', or 'delete'
     const [selectedProduct, setSelectedProduct] = useState(null); // For edit or delete
+    const [errors, setErrors] = useState({})
     // Fetch data from backend API
     useEffect(() => {
         const abortController = new AbortController(); // Create an AbortController instance
@@ -58,14 +59,27 @@ const Dashboard = () => {
     const handleSave = async () => {
         if (dialogType === 'add') {
             // Call backend API to add a new user
-            await axios.post('/employee/new', selectedProduct);
+            try {
+                await axios.post('/employee/new', selectedProduct);
+                setShowDialog(false);
+            } catch (error) {
+                console.log("Adding User failed:", error.response.data);
+                setErrors(error.response.data.errors || {});
+            };
+            
         } else if (dialogType === 'edit') {
             // Call backend API to update the user
-            await axios.put(`/employee/update/${selectedProduct._id}`, selectedProduct);
+            try {
+                await axios.put(`/employee/update/${selectedProduct._id}`, selectedProduct);
+                setShowDialog(false);
+            } catch (error) {
+                console.log("Editing User failed:", error.response.data);
+                setErrors(error.response.data.errors || {});
+            }
         }
         // Refresh data
         fetchProducts();
-        setShowDialog(false);
+        
     };
 
     const handleDelete = async () => {
@@ -183,8 +197,11 @@ const Dashboard = () => {
                     <p>Loading...</p>
                 ) : (
                     <DataTable value={products} responsiveLayout="scroll">
-                        <Column className="p-2" field="name" header="Name"></Column>
+                        <Column className="p-2" field="username" header="Username"></Column>
+                        <Column field="email" header="First name"></Column>
+                        <Column field="email" header="Last name"></Column>
                         <Column field="email" header="Email"></Column>
+                        <Column field="phonenumber" header="Phone Number"></Column>
                         <Column field="department" header="Department"></Column>
                         <Column field="points" header="Points"></Column>
                         <Column
@@ -237,13 +254,35 @@ const Dashboard = () => {
             <p>Are you sure you want to delete this user?</p>
         ) : dialogType === 'view' ? (
             <div>
-            <label>Name:</label>
+            <label>Username:</label>
             <div className="input-with-icon">
                 <i className="pi pi-user input-icon"></i>
                 <input
                     type="text"
                     className="dialog-input"
-                    value={selectedProduct?.name || ''}
+                    value={selectedProduct?.username || ''}
+                    disabled
+                />
+            </div>
+
+            <label>First name:</label>
+            <div className="input-with-icon">
+                <i className="pi pi-user input-icon"></i>
+                <input
+                    type="text"
+                    className="dialog-input"
+                    value={selectedProduct?.firstname || ''}
+                    disabled
+                />
+            </div>
+
+            <label>Last name:</label>
+            <div className="input-with-icon">
+                <i className="pi pi-user input-icon"></i>
+                <input
+                    type="text"
+                    className="dialog-input"
+                    value={selectedProduct?.lastname || ''}
                     disabled
                 />
             </div>
@@ -255,6 +294,17 @@ const Dashboard = () => {
                     type="email"
                     className="dialog-input"
                     value={selectedProduct?.email || ''}
+                    disabled
+                />
+            </div>
+
+            <label>Phone Number:</label>
+            <div className="input-with-icon">
+                <i className="pi pi-phone input-icon"></i>
+                <input
+                    type="phonenumber"
+                    className="dialog-input"
+                    value={selectedProduct?.phonenumber || ''}
                     disabled
                 />
             </div>
@@ -282,32 +332,87 @@ const Dashboard = () => {
             </div>
         </div>
         ) : (
-            <div>
-                <label>Name:</label>
+                <div>
+                <label>User name:</label>
                 <div className="input-with-icon">
                     <i className="pi pi-user input-icon"></i>
                     <input
                         type="text"
                         className="dialog-input"
-                        value={selectedProduct?.name || ''}
+                        required
+                        value={selectedProduct?.username || ''}
                         onChange={(e) =>
-                            setSelectedProduct((prev) => ({ ...prev, name: e.target.value }))
+                            setSelectedProduct((prev) => ({ ...prev, username: e.target.value }))
                         }
                     />
+                    
                 </div>
+             
+                {errors.username && <p className="text-red-500 text-sm w-[150px] break-words mt-1">{errors.username}</p>}
+                
+                <label>First name:</label>
+                <div className="input-with-icon">
+                    <i className="pi pi-user input-icon"></i>
+                    <input
+                        type="text"
+                        className="dialog-input"
+                        required
+                        value={selectedProduct?.firstname || ''}
+                        onChange={(e) =>
+                            setSelectedProduct((prev) => ({ ...prev, firstname: e.target.value }))
+                        }
+                    />
+                    
+                </div>
+                {errors.firstname && <p className="text-red-500 text-sm w-[150px] break-words mt-1">{errors.firstname}</p>}
 
+                <label>Last name:</label>
+                <div className="input-with-icon">
+                    <i className="pi pi-user input-icon"></i>
+                    <input
+                        type="text"
+                        className="dialog-input"
+                        required
+                        value={selectedProduct?.lastname || ''}
+                        onChange={(e) =>
+                            setSelectedProduct((prev) => ({ ...prev, lastname: e.target.value }))
+                        }
+                    />
+                    
+                </div>
+             
+                {errors.lastname && <p className="text-red-500 text-sm w-[150px] break-words mt-1">{errors.lastname}</p>}
                 <label>Email:</label>
                 <div className="input-with-icon">
                     <i className="pi pi-envelope input-icon"></i>
                     <input
                         type="email"
                         className="dialog-input"
+                        required
                         value={selectedProduct?.email || ''}
                         onChange={(e) =>
                             setSelectedProduct((prev) => ({ ...prev, email: e.target.value }))
                         }
                     />
                 </div>
+
+                {errors.email && <p className="text-red-500 text-sm w-[150px] break-words mt-1">{errors.email}</p>}
+
+                <label>Phone Number:</label>
+                <div className="input-with-icon">
+                    <i className="pi pi-phone input-icon"></i>
+                    <input
+                        type="phonenumber"
+                        className="dialog-input"
+                        required
+                        value={selectedProduct?.phonenumber || ''}
+                        onChange={(e) =>
+                            setSelectedProduct((prev) => ({ ...prev, phonenumber: e.target.value }))
+                        }
+                    />
+                </div>
+
+                {errors.phonenumber && <p className="text-red-500 text-sm w-[150px] break-words mt-1">{errors.phonenumber}</p>}
 
                 <label>Department:</label>
                 <div className="input-with-icon">

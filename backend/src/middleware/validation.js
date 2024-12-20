@@ -1,4 +1,5 @@
-const validateSignup = (values) => {
+const Users = require('../models/Users');
+async function validateSignup (values) {
 
     let errors = {};
     
@@ -10,9 +11,12 @@ const validateSignup = (values) => {
     const numberRegex = /^[0-9]+$/;
     // Allow letters, numbers, and underscores
 // username validation
-
+    const existinguser = await Users.findOne({ username: values.username });
+    
     if (!values.username) {
         errors.username = 'username is required';
+    } else if (existinguser) {
+        errors.username = 'User already exists';
     }
     else if (values.username.length < minLength || values.username.length > maxLength) {
         errors.username = "Username must be between 3 and 20 characters long.";
@@ -39,6 +43,7 @@ const validateSignup = (values) => {
     } else if (!nameRegex.test(values.firstname)) {
         errors.firstName = "First name can only contain letters.";
     }
+    
 // lastName validation
 
     if (!values.lastname) {
@@ -52,7 +57,7 @@ const validateSignup = (values) => {
 
     if (!values.number) {
         errors.number = 'Number is required';
-    } else if (values.number.length === 11) {
+    } else if (values.number.length !== 11) {
         errors.number = 'Number must be 11 characters';
     } else if (!numberRegex.test(values.number)) {
         errors.number = "Number can only contain numbers.";

@@ -1,4 +1,7 @@
 const Employee = require('../models/Employee');
+const evalidate = require('../middleware/evalidation');
+const bcrypt = require('bcrypt');
+const admin = require('../models/Users');
 
 const employeeController = {
     // Get all employees
@@ -40,13 +43,25 @@ const employeeController = {
     // Create new employee
     createEmployee: async (req, res) => {
         const employee = new Employee({
-            name: req.body.name,
+            username: req.body.username,
             email: req.body.email,
             points: req.body.points || 0,
-            department: req.body.department,
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            phonenumber: req.body.phonenumber,
+            department: req.body.department, 
             userId: req.user._id
         });
-
+        user = await admin.findOne({ _id: employee.userId });
+        employee.company = user.company;
+        employee.password = await bcrypt.hash('P@ssw0rd2024', 10);
+        console.log(employee);
+        const errors = evalidate(employee);
+        console.log(errors);
+        if (Object.keys(errors).length > 0) {
+            console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
+            return res.status(400).json({ errors });
+        }
         try {
             const newEmployee = await employee.save();
             res.status(201).json(newEmployee);
@@ -91,11 +106,19 @@ const employeeController = {
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
-
-            employee.name = req.body.name;
+            const errors = evalidate(req.body);
+            console.log(errors);
+            if (Object.keys(errors).length > 0) {
+                console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
+                return res.status(400).json({ errors });
+            }
+            employee.username = req.body.username;
+            employee.firstname = req.body.firstname;
+            employee.lastname = req.body.lastname;
             employee.email = req.body.email;
             employee.department = req.body.department;
             employee.points = req.body.points;
+            employee.phonenumber = req.body.phonenumber;
             const updatedEmployee = await employee.save();
             res.json(updatedEmployee);
         } catch (error) {

@@ -1,6 +1,7 @@
 const express = require('express');
 const RefreshToken = require('../models/RefreshToken');
 const Users = require('../models/Users');
+const emp = require('../models/Employee');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -28,32 +29,70 @@ function generateAccessToken(user) {
 }
 
 
+// const login = async (req, res) => {
+//     try {
+//         const { username, password } = req.body;
+//         console.log("username: " + username);
+//         //check username
+//         const user = await Users.findOne({ username });
+//         if (!user) return res.status(400).json({ error: 'Invalid username or password' });
+//         //check password
+//         const validPassword = await bcrypt.compare(password, user.password);
+//         if (!validPassword) return res.status(400).json({ error: 'Invalid username or password' });
+//         //create and assign a token
+//         const userPayload = { _id: user._id, username: user.username, name: user.firstname };
+//         console.log("user: " + user);
+//         console.log("userPayload: ", userPayload);
+//         const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s'});
+//         const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'});
+//         //save refresh token
+//         await RefreshToken.deleteMany({});
+//         await new RefreshToken({ token: refreshToken, userId: user._id }).save();
+
+//         res.json({ accessToken: accessToken , refreshToken: refreshToken });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Internal Server occurred' });
+//     }
+// }
+
 const login = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, role } = req.body; // Add `role` parameter to differentiate users.
         console.log("username: " + username);
-        //check username
-        const user = await Users.findOne({ username });
+        if (!username || !password || !role) {
+            return res.status(400).json({ error: 'Username, password, and role are required' });
+        }
+        
+        // Determine the collection based on role
+        const UserModel = role === 'admin' ? Users : 'emp' ? emp : null;
+        if (!UserModel) return res.status(400).json({ error: 'Invalid role' });
+
+        // Check username
+        const user = await UserModel.findOne({ username });
         if (!user) return res.status(400).json({ error: 'Invalid username or password' });
-        //check password
+        
+        // Check password
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) return res.status(400).json({ error: 'Invalid username or password' });
-        //create and assign a token
-        const userPayload = { _id: user._id, username: user.username, name: user.firstname };
+        
+        // Create and assign a token
+        const userPayload = { _id: user._id, username: user.username, name: user.firstname, role };
         console.log("user: " + user);
         console.log("userPayload: ", userPayload);
-        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s'});
-        const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'});
-        //save refresh token
-        await RefreshToken.deleteMany({});
+        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
+        const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+        
+        // Save refresh token
+        await RefreshToken.deleteMany({}); // Clear existing tokens for simplicity (optional)
         await new RefreshToken({ token: refreshToken, userId: user._id }).save();
 
-        res.json({ accessToken: accessToken , refreshToken: refreshToken });
+        res.json({ accessToken: accessToken, refreshToken: refreshToken });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server occurred' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];

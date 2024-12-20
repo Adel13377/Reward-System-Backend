@@ -13,7 +13,8 @@ const Register = () => {
             try {
                 const response = await axios.post('http://localhost:3000/admin/login', {
                     username: userName,
-                    password: password
+                    password: password,
+                    role: 'admin'
                 });
                 const { accessToken, refreshToken } = response.data;
                 localStorage.setItem("accessToken", accessToken);

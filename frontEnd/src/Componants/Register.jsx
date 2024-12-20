@@ -26,7 +26,7 @@ const Register = () => {
         try {
             const response = await axios.post('http://localhost:3000/admin/signup', userData);
             console.log(response.data);
-            navigation("/dashboard");
+            navigation("/");
         } catch (error) {
             console.log("Registration failed:", error.response.data);
             setErrors(error.response.data.errors || {});
