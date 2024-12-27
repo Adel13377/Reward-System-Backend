@@ -17,7 +17,7 @@ const LoginSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    number: {
+    phonenumber: {
         type: Number,
         required: true
     },

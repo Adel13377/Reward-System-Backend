@@ -198,8 +198,8 @@ const Dashboard = () => {
                 ) : (
                     <DataTable value={products} responsiveLayout="scroll">
                         <Column className="p-2" field="username" header="Username"></Column>
-                        <Column field="email" header="First name"></Column>
-                        <Column field="email" header="Last name"></Column>
+                        <Column field="firstname" header="First name"></Column>
+                        <Column field="lastname" header="Last name"></Column>
                         <Column field="email" header="Email"></Column>
                         <Column field="phonenumber" header="Phone Number"></Column>
                         <Column field="department" header="Department"></Column>

@@ -1,5 +1,5 @@
 const Employee = require('../models/Employee');
-const evalidate = require('../middleware/evalidation');
+const validateSignup = require('../middleware/validation');
 const bcrypt = require('bcrypt');
 const admin = require('../models/Users');
 
@@ -28,8 +28,7 @@ const employeeController = {
                 return res.status(404).json({ message: "couldn't find your employees" });
             }
             const employee = await Employee.find({
-                _id: req.params.id,
-                userId: adminid
+                _id: adminid
             });
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
@@ -42,31 +41,41 @@ const employeeController = {
 
     // Create new employee
     createEmployee: async (req, res) => {
-        const employee = new Employee({
-            username: req.body.username,
-            email: req.body.email,
-            points: req.body.points || 0,
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            phonenumber: req.body.phonenumber,
-            department: req.body.department, 
-            userId: req.user._id
-        });
-        user = await admin.findOne({ _id: employee.userId });
-        employee.company = user.company;
-        employee.password = await bcrypt.hash('P@ssw0rd2024', 10);
-        console.log(employee);
-        const errors = evalidate(employee);
-        console.log(errors);
-        if (Object.keys(errors).length > 0) {
-            console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
-            return res.status(400).json({ errors });
-        }
         try {
+            const adminUser = await admin.findById(req.user._id); // Assuming req.user is already populated with admin user info
+    
+            const employeeData = {
+                username: req.body.username,
+                email: req.body.email,
+                points: req.body.points || 0,
+                firstname: req.body.firstname,
+                lastname: req.body.lastname,
+                phonenumber: req.body.phonenumber,
+                department: req.body.department,
+                userId: adminUser._id,
+                company: adminUser.company,
+                password: 'P@ssw0rd2024', // Using plain text password here for validation; will hash later
+            };
+            console.log(adminUser);
+            console.log(adminUser.company);
+            // Validate employee data
+            const errors = await validateSignup(employeeData);
+            if (Object.keys(errors).length > 0) {
+                console.log(`Validation Errors: ${JSON.stringify(errors, null, 2)}`);
+                return res.status(400).json({ errors });
+            }
+    
+            // Create and save employee after validation
+            const employee = new Employee({
+                ...employeeData,
+                password: await bcrypt.hash(employeeData.password, 10), // Hash password before saving
+            });
+    
             const newEmployee = await employee.save();
             res.status(201).json(newEmployee);
         } catch (error) {
-            res.status(400).json({ message: error.message });
+            console.error('Error creating employee:', error.message);
+            res.status(500).json({ message: error.message });
         }
     },
 
@@ -106,7 +115,8 @@ const employeeController = {
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
-            const errors = evalidate(req.body);
+            console.log(req.body);
+            const errors = await validateSignup(req.body, employee._id);
             console.log(errors);
             if (Object.keys(errors).length > 0) {
                 console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);

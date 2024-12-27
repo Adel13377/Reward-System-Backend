@@ -1,5 +1,6 @@
 const Users = require('../models/Users');
-async function validateSignup (values) {
+const employee = require('../models/Employee');
+async function validateSignup (values, currentEmployeeId = null) {
 
     let errors = {};
     
@@ -9,14 +10,19 @@ async function validateSignup (values) {
     const nameRegex = /^[a-zA-Z]+$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/;
     const numberRegex = /^[0-9]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // Allow letters, numbers, and underscores
 // username validation
-    const existinguser = await Users.findOne({ username: values.username });
-    
+    const existingUser = await Users.findOne({ username: values.username });
+    const existingEmployee = await employee.findOne({ username: values.username,
+        _id: { $ne: currentEmployeeId }
+     });
+    if (existingEmployee || existingUser) {
+        errors.username = 'User already exists';
+    }
+        
     if (!values.username) {
         errors.username = 'username is required';
-    } else if (existinguser) {
-        errors.username = 'User already exists';
     }
     else if (values.username.length < minLength || values.username.length > maxLength) {
         errors.username = "Username must be between 3 and 20 characters long.";
@@ -55,12 +61,22 @@ async function validateSignup (values) {
     }
 // number validation
 
-    if (!values.number) {
-        errors.number = 'Number is required';
-    } else if (values.number.length !== 11) {
-        errors.number = 'Number must be 11 characters';
-    } else if (!numberRegex.test(values.number)) {
-        errors.number = "Number can only contain numbers.";
+    if (!values.phonenumber) {
+        errors.phonenumber = 'Number is required';
+    } else if (values.phonenumber.length !== 11) {
+        errors.phonenumber = 'Number must be 11 characters';
+    } else if (!numberRegex.test(values.phonenumber)) {
+        errors.phonenumber = "Number can only contain numbers.";
+    }
+
+// email validation
+    if (values.userId) {
+        if (!values.email) {
+            errors.email = 'email is required';
+        }
+        else if (!emailRegex.test(values.email)) {
+            errors.email = "Invalid email address.";
+        }
     }
 // company validation
 

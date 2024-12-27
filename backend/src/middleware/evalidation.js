@@ -1,4 +1,4 @@
-const evalidate = (values) => {
+const  evalidate = (values) => {
 
     let errors = {};
     

@@ -8,7 +8,7 @@ const Register = () => {
     const [password,setPassword]=useState("")
     const [firstname,setFirstName]=useState("")
     const [lastname,setLastName]=useState("")
-    const [number,setNumber]=useState()
+    const [phonenumber,setPhonenumber]=useState()
     const [company,setCompany]=useState("")
     const [errors, setErrors] = useState({})
     const navigation=useNavigate()
@@ -19,7 +19,7 @@ const Register = () => {
             firstname,
             lastname,
             password,
-            number,
+            phonenumber,
             company
         };
 
@@ -68,8 +68,8 @@ const Register = () => {
                 <div className="flex gap-2">
                     <div className="flex flex-col">
                         <label htmlFor="phone">Phone<span className="text-red-600">*</span></label>
-                        <input className="border-[1px] border-gray-300 rounded-md" type="text" required id="phone" value={number} onChange={(e) =>setNumber(e.target.value)}/>
-                        {errors.number && <p className="text-red-500 text-sm w-[150px] break-words mt-1">{errors.number}</p>}
+                        <input className="border-[1px] border-gray-300 rounded-md" type="text" required id="phone" value={phonenumber} onChange={(e) =>setPhonenumber(e.target.value)}/>
+                        {errors.phonenumber && <p className="text-red-500 text-sm w-[150px] break-words mt-1">{errors.phonenumber}</p>}
                     </div>
                     <div className="flex flex-col">
                         <label htmlFor="company">Company Name<span className="text-red-600">*</span></label>

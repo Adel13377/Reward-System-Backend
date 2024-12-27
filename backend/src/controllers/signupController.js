@@ -9,7 +9,7 @@ const signup = async (req, res) => {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         password: req.body.password,
-        number: req.body.number,
+        phonenumber: req.body.phonenumber,
         company: req.body.company
     }
     
