@@ -13,7 +13,9 @@ async function validateSignup (values, currentEmployeeId = null) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // Allow letters, numbers, and underscores
 // username validation
-    const existingUser = await Users.findOne({ username: values.username });
+    const existingUser = await Users.findOne({ username: values.username,
+        _id: { $ne: currentEmployeeId }
+     });
     const existingEmployee = await employee.findOne({ username: values.username,
         _id: { $ne: currentEmployeeId }
      });

@@ -9,10 +9,6 @@ import { Buffer } from 'buffer';
 import { jwtDecode } from 'jwt-decode';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { confirmDialog } from 'primereact/confirmdialog';
-// import axi from "axios";
-// import { ConfirmDialog } from 'primereact/confirmdialog';
-// import { confirmDialog } from 'primereact/confirmdialog';
-// import { Dialog } from 'primereact/dialog';
 
 window.Buffer = Buffer;
 const Dashboard = () => {
@@ -22,7 +18,9 @@ const Dashboard = () => {
     const [showDialog, setShowDialog] = useState(false);
     const [dialogType, setDialogType] = useState(''); // 'add', 'edit', or 'delete'
     const [selectedProduct, setSelectedProduct] = useState(null); // For edit or delete
-    const [errors, setErrors] = useState({})
+    const [errors, setErrors] = useState({});
+    const [transactions, setTransactions] = useState([]);
+    const [query, setQuery] = useState('');
     // Fetch data from backend API
     useEffect(() => {
         const abortController = new AbortController(); // Create an AbortController instance
@@ -56,6 +54,56 @@ const Dashboard = () => {
         };
     }, []); // Empty dependency array to run on component mount only
 
+    const handleInputChange = (e) => {
+        setQuery(e.target.value);
+    };
+
+    // Handle search form submission
+    const handleSearch = async (e) => {
+        e.preventDefault(); // Prevent form reload
+        try {
+            const response = await axios.get(`/employee/search?q=${query}`);
+            setProducts(response.data); // Update products with fetched data
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    const fetchTransactions = async (rowData) => {
+        try {
+            const response = await axios.get(`/employee/transactions/${rowData._id}`);
+            setTransactions(response.data);
+            setLoading(false);
+        } catch (err) {
+            setErrors(err.message);
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async (rowData) => {
+        try {
+
+                await axios.put(`/employee/reset/${rowData._id}`);
+                 // Refresh the data
+                alert('Password reset successfully!');
+            
+        } catch (error) {
+            console.error('Error resetting password:', error);
+        }
+        fetchProducts();
+    };
+
+    const confirmResetPassword = (rowData) => {
+         // Set the user to be reset
+        confirmDialog({
+            message: `Are you sure you want to reset the password for ${rowData.username}?`,
+            header: 'Reset Password Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => handleResetPassword(rowData), // Call the reset handler on confirmation
+            reject: () => console.log('ok'), // Reset the state if rejected
+        });
+    };
+
     const handleSave = async () => {
         if (dialogType === 'add') {
             // Call backend API to add a new user
@@ -80,6 +128,13 @@ const Dashboard = () => {
         // Refresh data
         fetchProducts();
         
+    };
+
+    const formatDate = (isoDate) => {
+        const date = new Date(isoDate);
+        const formattedDate = date.toLocaleDateString(); // Format as MM/DD/YYYY or similar based on locale
+        const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format as HH:MM
+        return { formattedDate, formattedTime };
     };
 
     const handleDelete = async () => {
@@ -112,7 +167,7 @@ const Dashboard = () => {
             if (response.status === 200) {
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
-                window.location.href = '/';
+                window.location.href = '/login';
             }
         } catch (error) {
             console.error('Logout failed:', error);
@@ -121,39 +176,57 @@ const Dashboard = () => {
 
     const actionsTemplate = (rowData) => {
         return (
-            <>
-                <button
-                    className="btn btn-success"
-                    onClick={() => {
-                        setDialogType('view');
-                        setSelectedProduct(rowData);
-                        setShowDialog(true);
-                    }}
-                >
-                    <i className="pi pi-eye"></i>
-                </button>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                        setDialogType('edit');
-                        console.log('Editing product:', rowData);
-                        setSelectedProduct(rowData);
-                        setShowDialog(true);
-                    }}
-                >
-                    <i className="pi pi-file-edit"></i>
-                </button>
-                <button
-                    className="btn btn-danger"
-                    onClick={() => {
-                        setDialogType('delete');
-                        setSelectedProduct(rowData);
-                        setShowDialog(true);
-                    }}
-                >
-                    <i className="pi pi-trash"></i>
-                </button>
-            </>
+            
+            <div className="actions-container">
+            {/* View transactions */}
+            <button
+                className="btn btn-success"
+                onClick={() => {
+                    setDialogType('view');
+                    fetchTransactions(rowData);
+                    setShowDialog(true);
+                }}
+                title="View transactions"
+            >
+                <i className="pi pi-eye"></i>
+            </button>
+        
+            {/* Edit employee */}
+            <button
+                className="btn btn-primary"
+                onClick={() => {
+                    setDialogType('edit');
+                    console.log('Editing product:', rowData);
+                    setSelectedProduct(rowData);
+                    setShowDialog(true);
+                }}
+                title="Edit employee"
+            >
+                <i className="pi pi-file-edit"></i>
+            </button>
+        
+            {/* Delete employee */}
+            <button
+                className="btn btn-danger"
+                onClick={() => {
+                    setDialogType('delete');
+                    setSelectedProduct(rowData);
+                    setShowDialog(true);
+                }}
+                title="Delete employee"
+            >
+                <i className="pi pi-trash"></i>
+            </button>
+        
+            {/* Reset password */}
+            <button
+                className="btn btn-warning"
+                onClick={() => confirmResetPassword(rowData)}
+                title="Reset password"
+            >
+                <i className="pi pi-refresh"></i>
+            </button>
+        </div>
         );
     };
     const confirmLogout = () => {
@@ -166,6 +239,15 @@ const Dashboard = () => {
         });
     };
     return (
+        <div className="min-h-screen bg-primaryColor py-2 px-4 rounded-lg">
+        <div className="mx-auto py-6 text-textColor flex items-center justify-center flex-col">
+        <div className="w-[70%] flex items-center justify-center pr-20">
+            <img
+                src="/rewardhup-high-resolution-logo-transparent.png"
+                alt="logo"
+                className="w-[100%]"
+            />
+            </div>
         <div className="dashboard text-center p-4">
             <h1>Hello {username}</h1>
             <button className="btn btn-danger mb-3" onClick={confirmLogout}>
@@ -193,9 +275,34 @@ const Dashboard = () => {
                         Add New User <i className="pi pi-plus"></i>
                     </button>
                 </div>
+                <div>
+
+            <form onSubmit={handleSearch} style={{ marginBottom: '20px' }}>
+                <input
+                    type="text"
+                    value={query}
+                    onChange={handleInputChange}
+                    placeholder="Search for employee..."
+                    style={{
+                        padding: '8px',
+                        width: '300px',
+                        marginRight: '10px',
+                        border: '1px solid #ccc',
+                        borderRadius: '8px',
+                        height: '39px',
+                    }}
+                />
+                <button
+                    className="btn btn-success mb-3"
+                >
+                    Search
+                </button>
+            </form>
+        </div>
                 {loading ? (
                     <p>Loading...</p>
                 ) : (
+                    
                     <DataTable value={products} responsiveLayout="scroll">
                         <Column className="p-2" field="username" header="Username"></Column>
                         <Column field="firstname" header="First name"></Column>
@@ -217,13 +324,15 @@ const Dashboard = () => {
                              }}
                         ></Column>
                     </DataTable>
+                    
                 )}
             </div>
-
+</div>
+</div>
             {/* Dialog Component */}
             <Dialog
                 className="custom-dialog"
-                header={dialogType === 'add' ? 'Add User' : dialogType === 'edit' ? 'Edit User' : dialogType === 'delete' ? 'Confirm Delete' : 'View user'}
+                header={dialogType === 'add' ? 'Add User' : dialogType === 'edit' ? 'Edit User' : dialogType === 'delete' ? 'Confirm Delete' : 'View Transactions'}
                 visible={showDialog}
                 style={{ width: '50%' }}
                 headerStyle={{  
@@ -254,82 +363,33 @@ const Dashboard = () => {
             <p>Are you sure you want to delete this user?</p>
         ) : dialogType === 'view' ? (
             <div>
-            <label>Username:</label>
-            <div className="input-with-icon">
-                <i className="pi pi-user input-icon"></i>
-                <input
-                    type="text"
-                    className="dialog-input"
-                    value={selectedProduct?.username || ''}
-                    disabled
-                />
-            </div>
-
-            <label>First name:</label>
-            <div className="input-with-icon">
-                <i className="pi pi-user input-icon"></i>
-                <input
-                    type="text"
-                    className="dialog-input"
-                    value={selectedProduct?.firstname || ''}
-                    disabled
-                />
-            </div>
-
-            <label>Last name:</label>
-            <div className="input-with-icon">
-                <i className="pi pi-user input-icon"></i>
-                <input
-                    type="text"
-                    className="dialog-input"
-                    value={selectedProduct?.lastname || ''}
-                    disabled
-                />
-            </div>
-
-            <label>Email:</label>
-            <div className="input-with-icon">
-                <i className="pi pi-envelope input-icon"></i>
-                <input
-                    type="email"
-                    className="dialog-input"
-                    value={selectedProduct?.email || ''}
-                    disabled
-                />
-            </div>
-
-            <label>Phone Number:</label>
-            <div className="input-with-icon">
-                <i className="pi pi-phone input-icon"></i>
-                <input
-                    type="phonenumber"
-                    className="dialog-input"
-                    value={selectedProduct?.phonenumber || ''}
-                    disabled
-                />
-            </div>
-
-            <label>Department:</label>
-            <div className="input-with-icon">
-                <i className="pi pi-sitemap input-icon"></i>
-                <input
-                    type="text"
-                    className="dialog-input"
-                    value={selectedProduct?.department || ''}
-                    disabled
-                />
-            </div>
-
-            <label>Points:</label>
-            <div className="input-with-icon">
-                <i className="pi pi-star input-icon"></i>
-                <input
-                    type="number"
-                    className="dialog-input"
-                    value={selectedProduct?.points || ''}
-                   disabled
-                />
-            </div>
+            <table border="1" style={{ width: '100%', textAlign: 'left', marginTop: '20px' }}>
+                <thead>
+                    <tr>
+                        <th>Partner</th>
+                        <th>Employee</th>
+                        <th>Points</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {transactions.map((transaction) => {
+                        const { formattedDate, formattedTime } = formatDate(transaction.date);
+                        return (
+                        <tr key={transaction._id}>
+                            <td>{transaction.thirdParty || 'N/A'}</td> {/* Rename "thirdParty" to "Partner" */}
+                            <td>{transaction.employee}</td>
+                            <td>{transaction.points}</td>
+                            <td>{transaction.type}</td>
+                            <td>{formattedDate}</td>
+                            <td>{formattedTime}</td>
+                        </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
         </div>
         ) : (
                 <div>

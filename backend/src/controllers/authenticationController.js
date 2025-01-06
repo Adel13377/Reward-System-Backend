@@ -4,6 +4,8 @@ const Users = require('../models/Users');
 const emp = require('../models/Employee');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const SuperAdmin = require('../models/SuperAdmin');
+const ThirdParty = require('../models/ThirdPartUsers');
 require('dotenv').config();
 
 const refreshToken = async (req, res) => {
@@ -17,8 +19,8 @@ const refreshToken = async (req, res) => {
         if (err) return res.sendStatus(403).json({ error: 'Invalid token' });
 
         console.log("Decoded user from refresh token:", user);
-        const { username, _id, name } = user;
-        const accessToken = generateAccessToken({ _id, username, name });
+        const { username, _id, name, role } = user;
+        const accessToken = generateAccessToken({ _id, username, name, role });
         console.log("accessToken: " + accessToken);
         res.json({ accessToken: accessToken })
     })
@@ -29,33 +31,6 @@ function generateAccessToken(user) {
 }
 
 
-// const login = async (req, res) => {
-//     try {
-//         const { username, password } = req.body;
-//         console.log("username: " + username);
-//         //check username
-//         const user = await Users.findOne({ username });
-//         if (!user) return res.status(400).json({ error: 'Invalid username or password' });
-//         //check password
-//         const validPassword = await bcrypt.compare(password, user.password);
-//         if (!validPassword) return res.status(400).json({ error: 'Invalid username or password' });
-//         //create and assign a token
-//         const userPayload = { _id: user._id, username: user.username, name: user.firstname };
-//         console.log("user: " + user);
-//         console.log("userPayload: ", userPayload);
-//         const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s'});
-//         const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'});
-//         //save refresh token
-//         await RefreshToken.deleteMany({});
-//         await new RefreshToken({ token: refreshToken, userId: user._id }).save();
-
-//         res.json({ accessToken: accessToken , refreshToken: refreshToken });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Internal Server occurred' });
-//     }
-// }
-
 const login = async (req, res) => {
     try {
         const { username, password, role } = req.body; // Add `role` parameter to differentiate users.
@@ -65,11 +40,19 @@ const login = async (req, res) => {
         }
         
         // Determine the collection based on role
-        const UserModel = role === 'admin' ? Users : 'emp' ? emp : null;
-        if (!UserModel) return res.status(400).json({ error: 'Invalid role' });
-
-        // Check username
-        const user = await UserModel.findOne({ username });
+        const UserModel =
+        role === 'admin' ? Users :
+        role === 'emp' ? emp :
+        role === 'superadmin' ? SuperAdmin :
+        role === 'thirdparty' ? ThirdParty :
+        null;
+    
+    if (!UserModel) {
+        return res.status(400).json({ error: 'Invalid role' }); // Send response and exit
+    }
+    
+    // Check username
+    const user = await UserModel.findOne({ username });
         if (!user) return res.status(400).json({ error: 'Invalid username or password' });
         
         // Check password
@@ -84,7 +67,7 @@ const login = async (req, res) => {
         const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
         
         // Save refresh token
-        await RefreshToken.deleteMany({}); // Clear existing tokens for simplicity (optional)
+        await RefreshToken.deleteMany({ userId: user._id}); // Clear existing tokens for simplicity (optional)
         await new RefreshToken({ token: refreshToken, userId: user._id }).save();
 
         res.json({ accessToken: accessToken, refreshToken: refreshToken });

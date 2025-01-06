@@ -17,5 +17,6 @@ router.get('/', offerController.getAllOffers);
 router.get('/:id', offerController.getOfferById);
 router.put('/:id', upload.single('image'), offerController.updateOffer);
 router.delete('/:id', offerController.deleteOffer);
+router.get('/search', offerController.searchOffer);
 
 module.exports = router;

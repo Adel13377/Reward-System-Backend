@@ -1,11 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Dashboard from "./Componants/Dashboard"
-import Register from "./Componants/Register"
 import Login from "./Componants/Login"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProtectedRoute from "./Componants/ProtectedRoute";
-
+import './App.css';
 function App() {
 
   return (
@@ -14,12 +13,10 @@ function App() {
       <ToastContainer></ToastContainer>
         <BrowserRouter>
           <Routes>
-            <Route path="/dashboard" element={ <ProtectedRoute>
+            <Route path="/" element={ <ProtectedRoute>
                                                   <Dashboard />
                                               </ProtectedRoute>} />
-            {/* <Route path="/dashboard" element={ <Dashboard /> } /> */}
-            <Route path="/register" element={<Register />} />
-            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </BrowserRouter>
       </div>

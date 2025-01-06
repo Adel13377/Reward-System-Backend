@@ -10,6 +10,11 @@ const offerSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    thirdPartyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ThirdParty',
+        required: true,
+    },
     imageUrl: {
         type: String,
         required: true,

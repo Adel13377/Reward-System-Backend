@@ -5,7 +5,17 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primaryColor: '#16b91a',
+        btnColor: '#81c784',
+        btnColorHover: '#81c745',
+        TextColor: '#ffff',
+        textInput: '#000',
+        deleteColor: '#ef4444',
+        deleteColorHover: '#ef4422',
+      },
+    },
   },
   plugins: [],
-}
+};

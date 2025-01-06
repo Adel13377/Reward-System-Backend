@@ -21,7 +21,7 @@ const Register = () => {
                 localStorage.setItem("refreshToken", refreshToken);
                 console.log("Login Done", accessToken);
                 toast("Login successful!");
-                navigate("dashboard")
+                navigate("/")
             } catch (error) {
                 console.error("Login failed:", error.response ? error.response.data : error.message);
                 toast("Invalid username or password");
@@ -43,29 +43,36 @@ const Register = () => {
     };
 
     return (
-        <div className="flex flex-col items-start gap-14 bg-gray-100 box-border shadow-gray-300 shadow-lg
-        border-[1px] border-gray-300 rounded-[5px] w-[300px] h-[300px]">
-            <div className="w-full h-3 font-medium text-3xl py-3 text-center">
-                <h1>Admin Login</h1>
+        <div className="bg-primaryColor flex justify-center items-center gap-2 flex-col pb-4">
+            <div className="w-[70%] flex items-center justify-center pr-20">
+            <img
+                src="/rewardhup-high-resolution-logo-transparent.png"
+                alt="logo"
+                className="w-[100%]"
+            />
             </div>
-            <div className="bg-white w-full p-2 text-sm font-normal h-[210px]">
+            <div className="flex flex-col items-start gap-14 text-TextColor rounded-[5px] w-[300px] h-[300px]">
+            <div className="w-full h-3 font-medium text-3xl py-1text-center">
+                <h1 className="text-3xl ">Admin Login</h1>
+            </div>
+            <div className=" w-full p-2 text-lg  h-[210px]">
                 <form onSubmit={proceedLogin}>
                     <div className="flex gap-2 flex-col ">
                         <div className="flex flex-col">
-                            <label htmlFor="username">UserName </label>
-                            <input className="border-[1px] border-gray-300 rounded-md  py-[3px] px-[5px]" type="text" value={userName} id="username" onChange={(e) => setUserName(e.target.value)} />
+                            <label htmlFor="username" className="block text-TextColor mb-2">UserName </label>
+                            <input className="border-[1px] border-gray-300 rounded-md text-textInput py-[3px] px-[5px]" type="text" value={userName} id="username" onChange={(e) => setUserName(e.target.value)} />
                         </div>
                         <div className="flex flex-col">
-                            <label htmlFor="password">Password</label>
-                            <input className="border-[1px] border-gray-300 rounded-md py-[3px] px-[5px]" type="password" value={password} id="password" onChange={(e) => setPassword(e.target.value)} />
+                            <label htmlFor="password" className="block text-TextColor mb-2">Password</label>
+                            <input className="border-[1px] border-gray-300 rounded-md text-textInput  py-[3px] px-[5px]" type="password" value={password} id="password" onChange={(e) => setPassword(e.target.value)} />
                         </div>
                     </div>
                     <div className="flex justify-evenly gap-4 items-center py-3">
-                        <input className="text-white bg-blue-700 cursor-pointer py-2 px-3 rounded-md" type="submit" value="Login" />
-                        <a href="register" className="text-white bg-green-700 cursor-pointer py-2 px-3 rounded-md">Resgister</a>
+                        <input className="w-full bg-btnColor hover:bg-btnColorHover text-white py-2 px-4 rounded duration-75" type="submit" value="Login" />
                     </div>
                 </form>
             </div>
+        </div>
         </div>
     );
 };

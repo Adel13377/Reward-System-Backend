@@ -2,6 +2,8 @@ const Employee = require('../models/Employee');
 const validateSignup = require('../middleware/validation');
 const bcrypt = require('bcrypt');
 const admin = require('../models/Users');
+const Transactions = require('../models/Transactions');
+const { request } = require('express');
 
 const employeeController = {
     // Get all employees
@@ -56,8 +58,7 @@ const employeeController = {
                 company: adminUser.company,
                 password: 'P@ssw0rd2024', // Using plain text password here for validation; will hash later
             };
-            console.log(adminUser);
-            console.log(adminUser.company);
+
             // Validate employee data
             const errors = await validateSignup(employeeData);
             if (Object.keys(errors).length > 0) {
@@ -115,12 +116,14 @@ const employeeController = {
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
-            console.log(req.body);
+
             const errors = await validateSignup(req.body, employee._id);
-            console.log(errors);
             if (Object.keys(errors).length > 0) {
                 console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
                 return res.status(400).json({ errors });
+            }
+            if (employee.points !== req.body.points) {
+                var oldP = employee.points;
             }
             employee.username = req.body.username;
             employee.firstname = req.body.firstname;
@@ -130,12 +133,50 @@ const employeeController = {
             employee.points = req.body.points;
             employee.phonenumber = req.body.phonenumber;
             const updatedEmployee = await employee.save();
+            if (oldP < employee.points) {
+                const newTransaction = new Transactions({
+                    employee: employee._id,
+                    points: employee.points - oldP,
+                    type: 'added',
+                });
+                await newTransaction.save();
+            }
+            if (employee.points < oldP) {
+                const newTransaction = new Transactions({
+                    employee: employee._id,
+                    points: oldP - employee.points,
+                    type: 'deducted',
+                });
+                await newTransaction.save();
+            }
+
             res.json(updatedEmployee);
         } catch (error) {
             res.status(400).json({ message: error.message });
     }
 },
 
+    resetpassword: async (req, res) => {
+        try {
+            const adminid = req.user._id;
+            if (!adminid) {
+                return res.status(404).json({ message: "couldn't update this employee" });
+            }
+            const employee = await Employee.findOne({
+                _id: req.params.id,
+                userId: adminid
+            });
+            if (!employee) {
+                return res.status(404).json({ message: 'Employee not found' });
+            }
+
+            employee.password = await bcrypt.hash("P@ssw0rd2024", 10);
+            const updatedEmployee = await employee.save();
+            res.json(updatedEmployee);
+        } catch (error) {
+            res.status(400).json({ message: error.message });
+        }
+    },
     // Delete employee
     deleteEmployee: async (req, res) => {
         try {
@@ -153,6 +194,33 @@ const employeeController = {
 
             await employee.deleteOne();
             res.json({ message: 'Employee deleted successfully' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    searchEmployee: async (req, res) => {
+        try {
+            const adminid = req.user._id;
+            if (!adminid) {
+                return res.status(404).json({ message: "couldn't find your employees" });
+            }
+
+            const query = req.query.q;
+            const isNumber = !isNaN(query); // Check if the query is a number
+
+            const employees = await Employee.find({
+                userId: adminid,
+                $or: [
+                    { username: { $regex: req.query.q, $options: 'i' } },
+                    { email: { $regex: req.query.q, $options: 'i' } },
+                    { firstname: { $regex: req.query.q, $options: 'i' } },
+                    { lastname: { $regex: req.query.q, $options: 'i' } },
+                    { department: { $regex: req.query.q, $options: 'i' } },
+                    ...(isNumber ? [{ phonenumber: Number(query) }] : [])
+                ]
+            });
+            res.json(employees);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }

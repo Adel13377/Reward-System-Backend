@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { logout, login, refreshToken } = require('../../src/controllers/authenticationController');
-const authenticateToken = require('../../src/controllers/authenticationController');
+const generateqr = require('../controller/generateqrController');
+const confirmation = require('../controller/confirmationController');
 
-router.post('/login-emp', login);
+router.post('/generate-qr', generateqr);
+router.post('/confirmation', confirmation);
 
 module.exports = router;
