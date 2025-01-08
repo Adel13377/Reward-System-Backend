@@ -16,12 +16,17 @@ const Register = () => {
                     password: password,
                     role: 'admin'
                 });
-                const { accessToken, refreshToken } = response.data;
+                const { accessToken, refreshToken, passwordChangeRequired } = response.data;
                 localStorage.setItem("accessToken", accessToken);
                 localStorage.setItem("refreshToken", refreshToken);
+                localStorage.setItem("passwordChangeRequired", passwordChangeRequired);
                 console.log("Login Done", accessToken);
                 toast("Login successful!");
-                navigate("/")
+                if (passwordChangeRequired) {
+                    navigate("/change-password");
+                } else {
+                    navigate("/")
+                }
             } catch (error) {
                 console.error("Login failed:", error.response ? error.response.data : error.message);
                 toast("Invalid username or password");

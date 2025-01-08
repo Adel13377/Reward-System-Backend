@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProtectedRoute from "./Componants/ProtectedRoute";
 import './App.css';
+import ChangePassword from "./Componants/ChangePass";
 function App() {
 
   return (
@@ -17,6 +18,7 @@ function App() {
                                                   <Dashboard />
                                               </ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
+            <Route path="/change-password" element={<ChangePassword />} />
           </Routes>
         </BrowserRouter>
       </div>
