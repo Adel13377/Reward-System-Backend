@@ -8,6 +8,10 @@ const SuperAdmin = require('../models/SuperAdmin');
 const ThirdParty = require('../models/ThirdPartUsers');
 require('dotenv').config();
 
+
+const DEFAULT_PASSWORD = "P@ssw0rd2024"; // Default password
+const DEFAULT_PASSWORD_HASH = bcrypt.hashSync(DEFAULT_PASSWORD, 10);
+
 const refreshToken = async (req, res) => {
     const refreshToken = req.body.token;
 
@@ -58,7 +62,7 @@ const login = async (req, res) => {
         // Check password
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) return res.status(400).json({ error: 'Invalid username or password' });
-        
+        const isDefaultPassword = await bcrypt.compare(password, DEFAULT_PASSWORD_HASH);
         // Create and assign a token
         const userPayload = { _id: user._id, username: user.username, name: user.firstname, role };
         console.log("user: " + user);
@@ -69,8 +73,9 @@ const login = async (req, res) => {
         // Save refresh token
         await RefreshToken.deleteMany({ userId: user._id}); // Clear existing tokens for simplicity (optional)
         await new RefreshToken({ token: refreshToken, userId: user._id }).save();
-
-        res.json({ accessToken: accessToken, refreshToken: refreshToken });
+        
+        
+        res.json({ accessToken: accessToken, refreshToken: refreshToken, passwordChangeRequired: isDefaultPassword});
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

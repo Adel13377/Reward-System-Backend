@@ -3,6 +3,7 @@ const employee = require('../../src/models/Employee');
 const thirdparty = require('../../src/models/ThirdPartUsers');
 const Transaction = require('../../src/models/Transactions');
 const ThirdPTransaction = require('../../src/models/ThirdPTrasactions');
+const { transactions } = require('../middleware/transactions');
 
 const confrimTransaction = async (req, res) => {
     try {
@@ -12,45 +13,24 @@ const confrimTransaction = async (req, res) => {
         if (!transaction) {
             return res.status(404).json({ message: 'Transaction not found' });
         }
-        // if (transaction.status !== 'pending') {
-        //     return res.status(400).json({ message: 'Transaction is already confirmed or rejected' });
-        // }
+        if (transaction.status !== 'pending') {
+            return res.status(400).json({ message: 'Transaction is already confirmed or rejected' });
+        }
+        const thirdpartyId = transaction.thirdParty;
         if (confirm) {
-            const Employee = await employee.findById(transaction.employee);
-            const Thirdparty = await thirdparty.findById(transaction.thirdParty);
-            if (!Employee || !Thirdparty) {
-                return res.status(404).json({ message: 'Employee or third party not found' });
+            const seccess = transactions(transaction.employee, transaction.thirdParty, transaction.points);
+            if (!seccess) {
+                response.status(403).json({ message: 'error in transaction middleware' });
             }
-            if (Employee.points < transaction.points) {
-                return res.status(400).json({ message: 'Insufficient points' });
-            }
-            Employee.points -= transaction.points;
-            Thirdparty.points += transaction.points;
-
-            await Employee.save();
-            await Thirdparty.save();
-
-            transaction.status = 'confirmed';
-            console.log(transaction);
-            const newtransaction = new Transaction({
-                employee: transaction.employee,
-                thirdParty: transaction.thirdParty,
-                points: transaction.points,
-                type: 'deducted',
-            });
-            console.log(newtransaction);
-            const thirdptransaction = new ThirdPTransaction({
-                employee: Employee.firstname + ' ' + Employee.lastname,
-                points: transaction.points,
-                description: transaction.description,
-            })
-            await newtransaction.save();
-            await thirdptransaction.save();
             await transaction.deleteOne();
+            // io.emit(`transaction:${thirdpartyId}`, { status: 'confirmed', message: 'Transaction confirmed.' });
             return res.status(200).json({ message: 'Transaction confirmed successfully' });
         } else {
             transaction.status = 'rejected';
             await transaction.deleteOne();
+
+            // io.emit(`transaction:${thirdpartyId}`, { status: 'rejected', message: 'Transaction rejected.' });
+            
             return res.status(200).json({ message: 'Transaction rejected successfully' });
         }
         // Confirm transaction

@@ -12,5 +12,6 @@ router.put('/update/:id', employeeController.editEmployee);
 router.put('/reset/:id', employeeController.resetpassword);
 router.get('/search', employeeController.searchEmployee);
 router.get('/transactions/:id', getTransactionsById);
+router.post('/changePassword', employeeController.changePassword);
 
 module.exports = router;

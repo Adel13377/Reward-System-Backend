@@ -140,6 +140,18 @@ const getThirdParties = async (req, res) => {
     }
 }
 
+ const getThirdParty = async (req, res) => {
+    try {
+        const thirdpart = await thirdparty.findById(req.user._id);
+        if (!thirdpart) {
+            return res.status(404).json({ message: 'Third party not found' });
+        }
+        res.json(thirdpart);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+ }
+
 const deleteThirdparties = async (req, res) => {
     try {
         console.log(req.params.id);
@@ -217,4 +229,4 @@ const searchThirdParty = async (req, res) => {
     }
 }
 
-module.exports = { searchThirdParty, searchAdmin, resetpassthird, edittingThirdParty, deleteThirdparties, getadmin, editadmin, deleteAdmin, resetpass, createThirdParty, getThirdParties };
+module.exports = { getThirdParty, searchThirdParty, searchAdmin, resetpassthird, edittingThirdParty, deleteThirdparties, getadmin, editadmin, deleteAdmin, resetpass, createThirdParty, getThirdParties };

@@ -25,12 +25,12 @@ const employeeController = {
     // Get single employee
     getEmployeeById: async (req, res) => {
         try {
-            const adminid = req.user._id;
-            if (!adminid) {
-                return res.status(404).json({ message: "couldn't find your employees" });
+            const employeeid = req.user._id;
+            if (!employeeid) {
+                return res.status(404).json({ message: "couldn't find the employee" });
             }
             const employee = await Employee.find({
-                _id: adminid
+                _id: employeeid
             });
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
@@ -132,6 +132,7 @@ const employeeController = {
             employee.department = req.body.department;
             employee.points = req.body.points;
             employee.phonenumber = req.body.phonenumber;
+            employee.pushToken = req.body.pushToken;
             const updatedEmployee = await employee.save();
             if (oldP < employee.points) {
                 const newTransaction = new Transactions({
@@ -171,6 +172,28 @@ const employeeController = {
             }
 
             employee.password = await bcrypt.hash("P@ssw0rd2024", 10);
+            const updatedEmployee = await employee.save();
+            res.json(updatedEmployee);
+        } catch (error) {
+            res.status(400).json({ message: error.message });
+        }
+    },
+
+    changePassword: async (req, res) => {
+        try {
+            const employee = await Employee.findOne({
+                _id: req.params.id,
+            });
+            if (!employee) {
+                return res.status(404).json({ message: 'Employee not found' });
+            }
+            const verify = await bcrypt.compare(req.body.oldpass, employee.password);
+
+            if (!verify) {
+                return res.status(400).json({ message: 'Old password is incorrect' });
+            }
+
+            employee.password = await bcrypt.hash(req.body.password, 10);
             const updatedEmployee = await employee.save();
             res.json(updatedEmployee);
         } catch (error) {

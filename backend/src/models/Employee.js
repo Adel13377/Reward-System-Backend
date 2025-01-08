@@ -12,7 +12,8 @@ const employeeSchema = new mongoose.Schema({
     phonenumber: { type: Number, required: true },
     joinDate: { type: Date, default: Date.now },
     company: { type: String, ref: 'Users', required: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true }
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true },
+    pushToken: { type: String, default: '' }
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);
