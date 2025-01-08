@@ -12,6 +12,7 @@ const path = require('path');
 const superadminRoutes = require('./routes/superAdminRoutes');
 const thirdPartyRoutes = require('../employeeapp/routes/thirdPartyRoutes');
 const socketIo = require('socket.io');
+const getofferstransactions = require('../employeeapp/routes/test');
 // Connect to database
 const app = express();
 
@@ -41,7 +42,8 @@ app.use('/admin', adminRoutes);
 app.use('/employee-app',authenticateToken.authenticateToken, empappRoutes);
 app.use('/superadmin', authenticateToken.authenticateToken, superadminRoutes); 
 app.use('/api/offers', authenticateToken.authenticateToken, OfferRoutes);
-app.use('/thirdparty', authenticateToken.authenticateToken, thirdPartyRoutes)
+app.use('/thirdparty', authenticateToken.authenticateToken, thirdPartyRoutes);
+app.use('/test', getofferstransactions);
 // Error handling
 app.use(errorHandler);
 

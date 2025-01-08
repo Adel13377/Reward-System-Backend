@@ -6,6 +6,7 @@ const transactionCodeSchema = new mongoose.Schema({
     offerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer', required: true },
     thirdPartyId: { type: mongoose.Schema.Types.ObjectId, ref: 'ThirdParty', required: true },
     createdAt: { type: Date, default: Date.now },
+    points: { type: Number, required: true },
     used: { type: Boolean, default: false }, // To track if the code is already used
 });
 

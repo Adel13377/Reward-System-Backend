@@ -48,6 +48,7 @@ const generateTransactionCode = async (req, res) => {
             employeeId,
             offerId,
             thirdPartyId,
+            points: offer.points
         });
 
         await transactionCode.save();

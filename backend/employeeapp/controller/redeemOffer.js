@@ -7,8 +7,10 @@ const redeemOffer = async (req, res) => {
     try {
         const thirdPartyId = req.user._id;
         const code = req.body.code;
-        const transactionCode = await TransactionCode.findOne({ code, thirdPartyId, used: false });
-
+        const transactionCode = await TransactionCode.findOne({ code, thirdPartyId:thirdPartyId, used: false });
+        console.log('Transaction code:', code);
+        console.log('Third party ID:', thirdPartyId);
+        console.log('Transaction code:', transactionCode);
         if (!transactionCode) {
             return res.status(403).json({ message: 'Invalid or already used code'});
         }
