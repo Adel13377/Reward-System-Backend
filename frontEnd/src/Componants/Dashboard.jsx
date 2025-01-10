@@ -9,9 +9,11 @@ import { Buffer } from 'buffer';
 import { jwtDecode } from 'jwt-decode';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { confirmDialog } from 'primereact/confirmdialog';
+import { useNavigate } from 'react-router-dom';
 
 window.Buffer = Buffer;
 const Dashboard = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]); // State to store fetched data
     const [loading, setLoading] = useState(true); // State for loading indicator
     const [username, setUsername] = useState('');
@@ -35,6 +37,7 @@ const Dashboard = () => {
                     console.log("DECODED TOKEN", JSON.stringify(decodedToken));
                     setUsername(decodedToken.name);
                 }
+                
                 const response = await axios.get('/employee/all', { signal });
                 setProducts(response.data); // Update state with fetched data
             } catch (error) {
@@ -250,9 +253,20 @@ const Dashboard = () => {
             </div>
         <div className="dashboard text-center p-4">
             <h1 className="text-3xl font-bold text-center mb-4 text-TextColor">Manage employees</h1>
-            <button className="btn btn-danger mb-3" onClick={confirmLogout}>
-                Logout <i className="pi pi-sign-out"></i>
-            </button>
+            <div className="flex justify-between items-center mb-6">
+                {/* Home Button */}
+                <button
+                    onClick={() => navigate('/change-password')}
+                    className="bg-btnColor text-white px-4 py-2 rounded-lg hover:bg-[#0c7810] transition-all duration-300"
+                >
+                    Change password
+                </button>
+
+                {/* Logout Button */}
+                <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all duration-300" onClick={confirmLogout}>
+                    Logout <i className="pi pi-sign-out"></i>
+                </button>
+            </div>
 
             {/* Confirm Dialog */}
             <ConfirmDialog
