@@ -29,13 +29,14 @@ else if (!usernameRegex.test(values.username)) {
 }
 // password validation
 
-if (!values.password) {
-    errors.password = 'Password is required';
-} else if (values.password.length < 8) {
-    errors.password = 'Password must be 8 or more characters';
-} else if (!passwordRegex.test(values.password)) {
-    errors.password = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
-}
+    if (!values.password) {
+        errors.password = 'Password is required';
+    } else if (values.password.length < 8) {
+        errors.password = 'Password must be 8 or more characters';
+    } else if (!passwordRegex.test(values.password)) {
+        errors.password = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
+    }
+
 if (!values.phonenumber) {
     errors.phonenumber = 'Number is required';
 } else if (values.phonenumber.length !== 11) {

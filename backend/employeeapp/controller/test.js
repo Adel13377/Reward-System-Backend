@@ -11,15 +11,11 @@ const getofferstransactions = async (req, res) => {
         for (const transaction of transactionCodee) {
             const offer = await Offer.findById(transaction.offerId).lean();
             const employee = await Employee.findById(transaction.employeeId).lean();
-            const thirdParty = await thirdparty.findById(transaction.thirdPartyId).lean();
             const newd = {
                 offer: offer ? offer.title : null,
                 user: employee ? employee.username : null,
-                store: thirdParty ? thirdParty.username : null,
-                points: transaction.points
             }
             update.push(newd);
-            console.log(update);
         }
         return res.status(200).json(update);
     } catch (err) {
