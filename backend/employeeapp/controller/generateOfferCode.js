@@ -8,11 +8,14 @@ const generateTransactionCode = async (req, res) => {
         const { offerId } = req.body;
 
         const found = await TransactionCode.findOne({ offerId, employeeId });
-
         if (found) {
+        if (found.used === false) {
             const fcode = found.code;
             return res.json({ fcode });
+        } else if (found.used === true) {
+            return res.status(201).json({ message: 'Offer already redeemed' });
         }
+    }
         // Validate inputs
         if (!offerId) {
             return res.status(400).json({ message: 'Offer ID is required' });

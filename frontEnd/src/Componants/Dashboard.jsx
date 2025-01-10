@@ -249,7 +249,7 @@ const Dashboard = () => {
             />
             </div>
         <div className="dashboard text-center p-4">
-            <h1>Hello {username}</h1>
+            <h1 className="text-3xl font-bold text-center mb-4 text-TextColor">Manage employees</h1>
             <button className="btn btn-danger mb-3" onClick={confirmLogout}>
                 Logout <i className="pi pi-sign-out"></i>
             </button>
@@ -272,7 +272,7 @@ const Dashboard = () => {
                             setShowDialog(true);
                         }}
                     >
-                        Add New User <i className="pi pi-plus"></i>
+                        Add New Employee <i className="pi pi-plus"></i>
                     </button>
                 </div>
                 <div>
@@ -332,7 +332,7 @@ const Dashboard = () => {
             {/* Dialog Component */}
             <Dialog
                 className="custom-dialog"
-                header={dialogType === 'add' ? 'Add User' : dialogType === 'edit' ? 'Edit User' : dialogType === 'delete' ? 'Confirm Delete' : 'View Transactions'}
+                header={dialogType === 'add' ? 'Add Employee' : dialogType === 'edit' ? 'Edit Employee' : dialogType === 'delete' ? 'Confirm Delete' : 'View Transactions'}
                 visible={showDialog}
                 style={{ width: '50%' }}
                 headerStyle={{  
@@ -360,7 +360,7 @@ const Dashboard = () => {
 >
     <div className="dialog-content">
         {dialogType === 'delete' ? (
-            <p>Are you sure you want to delete this user?</p>
+            <p>Are you sure you want to delete this employee?</p>
         ) : dialogType === 'view' ? (
             <div>
             <table border="1" style={{ width: '100%', textAlign: 'left', marginTop: '20px' }}>

@@ -5,7 +5,7 @@ async function evalidate (values, currentthirdId = null) {
     
     const minLength = 3;
     const maxLength = 20;
-    const usernameRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+    const usernameRegex = /^[a-zA-Z][a-zA-Z0-9_ ]*$/;
     const nameRegex = /^[a-zA-Z]+$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/;
     const numberRegex = /^[0-9]+$/;

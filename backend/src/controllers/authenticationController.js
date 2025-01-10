@@ -67,7 +67,7 @@ const login = async (req, res) => {
         const userPayload = { _id: user._id, username: user.username, name: user.firstname, role };
         console.log("user: " + user);
         console.log("userPayload: ", userPayload);
-        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
+        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
         const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
         
         // Save refresh token

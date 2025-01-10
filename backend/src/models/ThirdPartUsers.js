@@ -9,7 +9,8 @@ const thirdPartySchema = new mongoose.Schema({
     phonenumber: { type: Number, required: true },
     points: { type: Number, default: 0 , min: [0, 'Points cannot be negative'], required: false},
     industryType: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    website: { type: String, required: false },
 });
 
 // Create and export the model

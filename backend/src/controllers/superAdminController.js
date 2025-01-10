@@ -122,6 +122,7 @@ const createThirdParty = async (req, res) => {
             email: req.body.email,
             industryType: req.body.industrytype,
             imageUrl: `/third/${req.file.filename}`,
+            website: req.body.website,
         });
 
         const savedthirdparty = await newthirdparty.save();
@@ -200,6 +201,7 @@ const edittingThirdParty = async (req, res) => {
         thirdpart.email = req.body.email;
         thirdpart.phonenumber = req.body.phonenumber;
         thirdpart.industryType = req.body.industrytype;
+        thirdpart.website = req.body.website;
 
         console.log(thirdpart);
         const updatedThirdParty = await thirdpart.save();

@@ -62,7 +62,7 @@ html, body {
 }
 
 .data-list {
-    background-color: #fff;
+    background-color: primaryColor;;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;

@@ -1,9 +1,10 @@
 const Employee = require('../models/Employee');
-const validateSignup = require('../middleware/validation');
+const  validateSignup = require('../middleware/validation');
 const bcrypt = require('bcrypt');
 const admin = require('../models/Users');
 const Transactions = require('../models/Transactions');
 const { request } = require('express');
+const validatepass  = require('../middleware/validatepass');
 
 const employeeController = {
     // Get all employees
@@ -84,6 +85,7 @@ const employeeController = {
     updatePoints: async (req, res) => {
         try {
             const adminid = req.user._id;
+            
             if (!adminid) {
                 return res.status(404).json({ message: "couldn't update this employee" });
             }
@@ -105,19 +107,19 @@ const employeeController = {
 
     editEmployee: async (req, res) => {
         try {
-            const adminid = req.user._id;
-            if (!adminid) {
-                return res.status(404).json({ message: "couldn't update this employee" });
-            }
+            let errors = {};
             const employee = await Employee.findOne({
                 _id: req.params.id,
-                userId: adminid
             });
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
-
-            const errors = await validateSignup(req.body, employee._id);
+            req.body.company = employee.company;
+            if (req.body.password) {
+                 errors = await validateSignup(req.body, employee._id)
+            }else {
+                errors = await validateSignup(req.body, employee._id, 'y');
+            }
             if (Object.keys(errors).length > 0) {
                 console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
                 return res.status(400).json({ errors });
@@ -130,9 +132,22 @@ const employeeController = {
             employee.lastname = req.body.lastname;
             employee.email = req.body.email;
             employee.department = req.body.department;
-            employee.points = req.body.points;
+            employee.points = req.body.points || employee.points;
             employee.phonenumber = req.body.phonenumber;
-            employee.pushToken = req.body.pushToken;
+            if (req.body.oldPassword && req.body.password) {
+                const verify = await bcrypt.compare(req.body.oldPassword, employee.password);
+                if (verify) {
+                const errors = await validatepass(req.body);
+                if (Object.keys(errors).length > 0) {
+                    console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
+                    return res.status(400).json({ errors });
+                } 
+                
+                    employee.password = await bcrypt.hash(req.body.password, 10);
+                } else {
+                    return res.status(400).json({ message: 'Old password is incorrect' });
+                }
+            }
             const updatedEmployee = await employee.save();
             if (oldP < employee.points) {
                 const newTransaction = new Transactions({
@@ -182,15 +197,21 @@ const employeeController = {
     changePassword: async (req, res) => {
         try {
             const employee = await Employee.findOne({
-                _id: req.params.id,
+                _id: req.user._id,
             });
             if (!employee) {
                 return res.status(404).json({ message: 'Employee not found' });
             }
-            const verify = await bcrypt.compare(req.body.oldpass, employee.password);
-
-            if (!verify) {
-                return res.status(400).json({ message: 'Old password is incorrect' });
+            if (req.body.password !== req.body.confirmPassword) {
+                return res.status(400).json({ message: 'Password do not match' });
+            }
+            const errors = await validatepass(req.body);
+            if (Object.keys(errors).length > 0) {
+                console.log(`Erroooooors: ${JSON.stringify(errors, null, 2)}`);
+                return res.status(400).json({
+                    message: 'Validation failed',
+                    errors,
+                });
             }
 
             employee.password = await bcrypt.hash(req.body.password, 10);
