@@ -13,9 +13,6 @@ const superadminRoutes = require('./routes/superAdminRoutes');
 const thirdPartyRoutes = require('../employeeapp/routes/thirdPartyRoutes');
 const socketIo = require('socket.io');
 const getofferstransactions = require('../employeeapp/routes/test');
-const AIAssistantRoutes = require('../employeeapp/routes/AIAssistantRoutes');
-
-
 // Connect to database
 const app = express();
 
@@ -47,8 +44,6 @@ app.use('/superadmin', authenticateToken.authenticateToken, superadminRoutes);
 app.use('/api/offers', authenticateToken.authenticateToken, OfferRoutes);
 app.use('/thirdparty', authenticateToken.authenticateToken, thirdPartyRoutes);
 app.use('/test', getofferstransactions);
-app.use('/api', AIAssistantRoutes);
-
 // Error handling
 app.use(errorHandler);
 
