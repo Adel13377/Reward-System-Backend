@@ -121,8 +121,9 @@ const createThirdParty = async (req, res) => {
             phonenumber: req.body.phonenumber,
             email: req.body.email,
             industryType: req.body.industrytype,
-            imageUrl: `/third/${req.file.filename}`,
             website: req.body.website,
+            imageUrl: `/third/${req.file.filename}`,
+            
         });
 
         const savedthirdparty = await newthirdparty.save();
@@ -186,7 +187,7 @@ const edittingThirdParty = async (req, res) => {
     try {
         console.log(req.params.id);
         const thirdpart = await thirdparty.findById(req.params.id);
-        console.log(thirdpart);
+        console.log(req.body);
         if (!thirdpart) {
             return res.status(404).json({ message: 'Third party not found' });
         }
@@ -202,10 +203,11 @@ const edittingThirdParty = async (req, res) => {
         thirdpart.phonenumber = req.body.phonenumber;
         thirdpart.industryType = req.body.industrytype;
         thirdpart.website = req.body.website;
+        thirdpart.imageUrl = req.file ? `/third/${req.file.filename}` : thirdpart.imageUrl;
 
-        console.log(thirdpart);
+
         const updatedThirdParty = await thirdpart.save();
-        console.log(updatedThirdParty);
+
         res.json(updatedThirdParty);
     } catch (err) {
         res.status(500).json({ message: err.message });

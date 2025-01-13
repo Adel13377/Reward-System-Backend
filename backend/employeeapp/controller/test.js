@@ -1,7 +1,6 @@
 const transactionCode = require('../../src/models/TransactionCode');
 const Offer = require('../../src/models/Offers');
 const Employee = require('../../src/models/Employee');
-const thirdparty = require('../../src/models/ThirdPartUsers');
 
 const getofferstransactions = async (req, res) => {
     try {
