@@ -59,7 +59,7 @@ const ChangePassword = () => {
         <div className="change-password-container">
             <h2>Change Your Password</h2>
             <form onSubmit={handleChangePassword}>
-            {localStorage.getItem("passwordChangeRequired") && (
+            {!localStorage.getItem("passwordChangeRequired") && (
                     <div className="flex flex-col">
                         <label htmlFor="oldpass" className="block text-TextColor mb-2">Old Password</label>
                         <input

@@ -48,10 +48,10 @@ const Register = () => {
     };
 
     return (
-        <div className="bg-primaryColor flex justify-center items-center gap-2 flex-col pb-4">
+        <div className="bg-primaryColor flex justify-center h-full w-full items-center gap-2 flex-col pb-4">
             <div className="w-[70%] flex items-center justify-center pr-20">
             <img
-                src="/rewardhup-high-resolution-logo-transparent.png"
+                src="/rewardhub-high-resolution-logo__2_-removebg-preview-2.png"
                 alt="logo"
                 className="w-[100%]"
             />
