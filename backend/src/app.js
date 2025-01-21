@@ -47,7 +47,7 @@ app.use('/superadmin', authenticateToken.authenticateToken, superadminRoutes);
 app.use('/api/offers', authenticateToken.authenticateToken, OfferRoutes);
 app.use('/thirdparty', authenticateToken.authenticateToken, thirdPartyRoutes);
 app.use('/test', getofferstransactions);
-app.use('/api', AIAssistantRoutes);
+app.use('/ai', AIAssistantRoutes);
 
 
 // Error handling
